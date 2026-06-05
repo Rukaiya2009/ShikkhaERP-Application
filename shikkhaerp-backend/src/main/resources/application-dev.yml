@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:shikkhaerp
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  flyway:
+    enabled: false
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.shikkhaerp: DEBUG
