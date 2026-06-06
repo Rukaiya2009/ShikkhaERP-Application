@@ -18,19 +18,4 @@ public class TestController {
         response.put("version", "1.0.0");
         return response;
     }
-
-    @GetMapping("/info")
-    public Map<String, String> info() {
-        return Map.of(
-            "app", "ShikkhaERP",
-            "version", "1.0.0",
-            "environment", "Development",
-            "status", "Operational"
-        );
-    }
-
-    @GetMapping("/ping")
-    public String ping() {
-        return "pong";
-    }
 }
