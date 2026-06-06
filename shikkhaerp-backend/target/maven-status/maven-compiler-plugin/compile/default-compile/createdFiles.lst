@@ -1,3 +1,17 @@
+com\shikkhaerp\modules\auth\dto\RegisterRequest.class
+com\shikkhaerp\modules\user\entity\User.class
 com\shikkhaerp\bootstrap\api\TestController.class
 com\shikkhaerp\bootstrap\config\SecurityConfig.class
+com\shikkhaerp\modules\auth\service\AuthService.class
+com\shikkhaerp\core\dto\ApiResponse.class
+com\shikkhaerp\modules\user\service\UserService.class
+com\shikkhaerp\core\dto\ApiResponse$ApiResponseBuilder.class
+com\shikkhaerp\modules\auth\dto\AuthResponse.class
+com\shikkhaerp\bootstrap\security\JwtTokenProvider.class
+com\shikkhaerp\modules\auth\dto\LoginRequest.class
+com\shikkhaerp\modules\user\entity\User$UserRole.class
+com\shikkhaerp\modules\user\api\UserController.class
+com\shikkhaerp\modules\user\repository\UserRepository.class
+com\shikkhaerp\modules\auth\api\AuthController.class
+com\shikkhaerp\modules\user\entity\User$UserStatus.class
 com\shikkhaerp\ShikkhaErpApplication.class

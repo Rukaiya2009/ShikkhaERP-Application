@@ -1,79 +1,36 @@
 spring:
   application:
     name: ShikkhaERP
-  
   profiles:
-    active: ${ACTIVE_PROFILE:dev}
-  
+    active: dev
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/shikkhaerp}
-    username: ${DB_USERNAME:shikkhaerp_user}
-    password: ${DB_PASSWORD:password}
-    driver-class-name: org.postgresql.Driver
-  
+    url: jdbc:h2:mem:shikkhaerp
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
+    show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-        jdbc:
-          batch_size: 20
-    show-sql: false
-  
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
-    locations: classpath:db/migration
-  
-  cache:
-    type: redis
-    redis:
-      time-to-live: 600000
-  
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
+        dialect: org.hibernate.dialect.H2Dialect
 
 server:
-  port: ${SERVER_PORT:8080}
+  port: 8080
   servlet:
     context-path: /api
-  compression:
-    enabled: true
-  error:
-    include-message: always
-    include-binding-errors: always
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,prometheus
-  endpoint:
-    health:
-      show-details: always
 
 logging:
   level:
     com.shikkhaerp: DEBUG
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
 app:
-  name: ShikkhaERP
-  version: 1.0.0
-  api:
-    prefix: /api/v1
-  
   security:
     jwt:
-      secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+      secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
       expiration: 86400000
-      refresh-expiration: 604800000
-  
-  multi-tenant:
-    strategy: SCHEMA
-    default-tenant: public
