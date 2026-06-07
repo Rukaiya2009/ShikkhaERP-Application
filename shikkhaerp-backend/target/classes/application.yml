@@ -3,22 +3,30 @@ spring:
     name: ShikkhaERP
   profiles:
     active: dev
+  
+  # PostgreSQL Configuration
   datasource:
-    url: jdbc:h2:mem:shikkhaerp
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: 
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    url: jdbc:postgresql://localhost:5432/shikkhaerp
+    username: postgres
+    password: Farhana251@
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+  
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  # Disable H2 console
+  h2:
+    console:
+      enabled: false
 
 server:
   port: 8080
@@ -28,6 +36,7 @@ server:
 logging:
   level:
     com.shikkhaerp: DEBUG
+    org.hibernate.SQL: DEBUG
 
 app:
   security:
