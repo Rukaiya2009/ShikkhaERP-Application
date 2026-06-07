@@ -1,14 +1,20 @@
+
 package com.shikkhaerp.modules.user.service;
 
 import com.shikkhaerp.modules.user.entity.User;
 import com.shikkhaerp.modules.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -42,7 +48,6 @@ public class UserService {
         if (updatedUser.getName() != null) existingUser.setName(updatedUser.getName());
         if (updatedUser.getPhone() != null) existingUser.setPhone(updatedUser.getPhone());
         if (updatedUser.getAddress() != null) existingUser.setAddress(updatedUser.getAddress());
-        if (updatedUser.getProfileImage() != null) existingUser.setProfileImage(updatedUser.getProfileImage());
         if (updatedUser.getRole() != null) existingUser.setRole(updatedUser.getRole());
         if (updatedUser.getStatus() != null) existingUser.setStatus(updatedUser.getStatus());
         
@@ -55,55 +60,13 @@ public class UserService {
     }
     
     @Transactional
-    public void changePassword(String userId, String oldPassword, String newPassword) {
-        User user = getUserById(userId);
-        
-        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            throw new RuntimeException("Old password is incorrect!");
-        }
-        
-        user.setPassword(passwordEncoder.encode(newPassword));
-        user.setUpdatedAt(LocalDateTime.now());
-        userRepository.save(user);
-        
-        log.info("Password changed successfully for user: {}", user.getEmail());
-    }
-    
-    @Transactional
-    public void updateLastLogin(String userId) {
-        User user = getUserById(userId);
-        user.setLastLoginAt(LocalDateTime.now());
-        userRepository.save(user);
-    }
-    
-    @Transactional
-    public void enableUser(String id) {
+    public void updateUserStatus(String id, boolean enabled) {
         User user = getUserById(id);
-        user.setEnabled(true);
-        user.setStatus(User.UserStatus.ACTIVE);
+        user.setEnabled(enabled);
+        user.setStatus(enabled ? User.UserStatus.ACTIVE : User.UserStatus.INACTIVE);
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
-        log.info("User enabled: {}", user.getEmail());
-    }
-    
-    @Transactional
-    public void disableUser(String id) {
-        User user = getUserById(id);
-        user.setEnabled(false);
-        user.setStatus(User.UserStatus.INACTIVE);
-        user.setUpdatedAt(LocalDateTime.now());
-        userRepository.save(user);
-        log.info("User disabled: {}", user.getEmail());
-    }
-    
-    @Transactional
-    public void deleteUser(String id) {
-        User user = getUserById(id);
-        user.setEnabled(false);
-        user.setStatus(User.UserStatus.INACTIVE);
-        user.setUpdatedAt(LocalDateTime.now());
-        userRepository.save(user);
-        log.info("User deactivated: {}", user.getEmail());
+        log.info("User status updated: {} -> enabled={}", user.getEmail(), enabled);
     }
     
     public User getUserById(String id) {
@@ -120,20 +83,45 @@ public class UserService {
         return userRepository.findAll();
     }
     
+    public Page<User> getAllUsers(int page, int size, String role, String status) {
+        Pageable pageable = PageRequest.of(page, size);
+        
+        if (role != null && status != null) {
+            return userRepository.findByRoleAndStatus(
+                User.UserRole.valueOf(role), 
+                User.UserStatus.valueOf(status), 
+                pageable
+            );
+        } else if (role != null) {
+            return userRepository.findByRole(User.UserRole.valueOf(role), pageable);
+        } else if (status != null) {
+            return userRepository.findByStatus(User.UserStatus.valueOf(status), pageable);
+        }
+        
+        return userRepository.findAll(pageable);
+    }
+    
+    public Map<String, Long> getUserStatistics() {
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("total", userRepository.count());
+        stats.put("students", userRepository.countByRole(User.UserRole.STUDENT));
+        stats.put("teachers", userRepository.countByRole(User.UserRole.TEACHER));
+        stats.put("admins", userRepository.countByRole(User.UserRole.SUPER_ADMIN));
+        stats.put("active", userRepository.countByStatus(User.UserStatus.ACTIVE));
+        stats.put("inactive", userRepository.countByStatus(User.UserStatus.INACTIVE));
+        return stats;
+    }
+    
+    public List<User> searchUsers(String keyword) {
+        return userRepository.searchByName(keyword);
+    }
+    
     public List<User> getUsersByRole(User.UserRole role) {
         return userRepository.findByRole(role);
     }
     
-    public List<User> getUsersByStatus(User.UserStatus status) {
-        return userRepository.findByStatus(status);
-    }
-    
     public long getUserCount() {
         return userRepository.count();
-    }
-    
-    public long getUserCountByRole(User.UserRole role) {
-        return userRepository.countByRole(role);
     }
     
     public boolean existsByEmail(String email) {
